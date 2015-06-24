@@ -33,6 +33,8 @@ def browserLabel(binary):
   	return 'ivtbl_checks'
   elif 'ivtbl' in binary:
   	return 'ivtbl'
+  else:
+    return 'vanilla'
 
 if (__name__ == '__main__'):
   print browserLabel(argv[1])
