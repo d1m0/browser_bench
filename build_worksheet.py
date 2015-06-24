@@ -5,23 +5,24 @@ from format import *
 import sys
 from stats import getMean
 import pdb
-
+import json
+from oauth2client.client import SignedJwtAssertionCredentials
 
 p = argparse.ArgumentParser(description=\
   "Given a set of runs for several browsers build a GoogleDocs spread sheet comparing the results")
-p.add_argument('--email', type=str, help='Google email')
-p.add_argument('--passw', type=str, help='Google password')
+p.add_argument('--key', type=str, help='Path to JSON key for Google Dev Project')
 p.add_argument('--title', type=str, help='Title of an existing empty spreadsheet in which to work')
-p.add_argument('--sheet', type=str, default='sheet1', help='Title of an existing empty spreadsheet in which to work')
 p.add_argument('results_file', type=str, help='File with raw results')
 
 args = p.parse_args()
 
-print "Logging in as {0}".format(args.email)
-gd = gspread.login(args.email, args.passw)
+print "Logging in ..."
+json_key = json.load(open(args.key))                                                                                                                       
+scope = ['https://spreadsheets.google.com/feeds']                                                                                                          
+credentials = SignedJwtAssertionCredentials(json_key['client_email'], json_key['private_key'], scope)                                                      
+gc = gspread.authorize(credentials)                                                                                                                        
 print "Opening {0}".format(args.title)
-ss = gd.open(args.title)
-ws = ss.sheet1
+ws = gc.open(args.title).sheet1                 
 
 print "Setting up document"
 r = load(args.results_file) 
@@ -150,7 +151,7 @@ def buildResultsTable2(ws, startRow, startCol, r):
   nruns = len(col_scores(cols(r)[0]))
   resCols = [[col_label(x), col_benchmark(x)] + meansCol(x) for x in cols(r)]
 
-  def cname(col):   return col[1] + ',' + col[0]
+  def cname(col):   return str(col[1]) + ',' + str(col[0])
 
 	# Furthermore we impose an ordering for neatness, and remember where vanilla values are
   def sortF(c1, c2):
@@ -207,7 +208,7 @@ def buildSummaryTable(ws, startRow, startCol, resTbl, r):
 
   sumTbl = Table(startRow, startCol, browsers, benchmarks + [ 'Average' ], ws)
   contents = [\
-    ['=' + resTbl.cellLbl('Mean Overhead (%)', benchmark + ',' + browser) \
+    ['=' + resTbl.cellLbl('Mean Overhead (%)', benchmark + ',' + str(browser)) \
       for benchmark in benchmarks] + \
       ['=average({0}:{1})'.format(sumTbl.cellLbl(browser, benchmarks[0]),
 			          sumTbl.cellLbl(browser, benchmarks[-1]))] \
@@ -217,7 +218,9 @@ def buildSummaryTable(ws, startRow, startCol, resTbl, r):
   sumTbl.setContents(contents)
   return sumTbl
 
+print "Building Results table"
 resTbl = buildResultsTable2(ws, 7,1, r)
 resTbl.put()
+print "Building Summary table"
 sumTbl = buildSummaryTable(ws, 8 + resTbl.height(), 1, resTbl, r)
 sumTbl.put()

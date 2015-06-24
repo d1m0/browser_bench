@@ -29,6 +29,10 @@ def browserLabel(binary):
   	return 'double'
   elif 'hybrid' in binary:
   	return 'safedisp'
+  elif 'ivtbl_checks' in binary:
+  	return 'ivtbl_checks'
+  elif 'ivtbl' in binary:
+  	return 'ivtbl'
 
 if (__name__ == '__main__'):
   print browserLabel(argv[1])

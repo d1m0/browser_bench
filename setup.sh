@@ -14,3 +14,5 @@ cd sigar/bindings/python
 python setup.py install
 cd ..
 popd
+pip install oauth2client
+deactivate

@@ -1,1 +1,4 @@
-# browser_bench
+Dependencies:
+
+ - sigar
+
