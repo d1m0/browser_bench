@@ -15,4 +15,5 @@ python setup.py install
 cd ..
 popd
 pip install oauth2client
+pip install pycrypto
 deactivate
