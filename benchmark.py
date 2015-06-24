@@ -11,18 +11,11 @@ import argparse
 from time import sleep
 from format import store
 from pick_safedispatch import pickSDBrowser
-from browser_label import browserLabel
 import posixpath
 import urllib
+from common import error, debug
 
 base = os.path.dirname(os.path.abspath(__file__)) + '/static/'
-
-def debug(s):
-  sys.stderr.write(s + '\n');
-
-def error(s):
-  debug(s);
-  sys.exit(-1)
 
 def myread(fname, total_tries):
   try:
@@ -156,7 +149,7 @@ def runBenchmarkSet(browser, browser_args, benchmark, port, nruns):
   for i in xrange(0, nruns):
     results.append(runOneBenchmark(browser, browser_args, benchmark, port))
 
-  return (browserLabel(browser), benchmark, browser, results)
+  return (browserLabels[browser], benchmark, browser, results)
 
 def runOneBenchmark(browser, browser_args, benchmark, port):
   debug("Running one {0} benchmark for browser {1} on port {2}".format(\
@@ -403,6 +396,7 @@ if (__name__ == '__main__'):
   parser = argparse.ArgumentParser(description='Run a single benchmark and print the results')
   parser.add_argument('command', type=str, choices=['run-server', 'list-available-benchmarks', 'run-benchmark'])
   parser.add_argument('--browser', type=str, nargs='+', help='path to browser executable')
+  parser.add_argument('--labels', type=str, nargs='+', help='human-readable names for each browser')
   parser.add_argument('--browser_args', type=str, nargs='+', help='additional arguments to pass browser before the URL', default='')
   parser.add_argument('--benchmark', type=str, nargs='+', help='name of benchmark to run. One of: ' + ' '.join(availableBenchmarks()))
   parser.add_argument('--nruns', type=int, help='number of times to repeat a benchmark', default=1, required=False)
@@ -414,8 +408,13 @@ if (__name__ == '__main__'):
   elif (args.command == 'list-available-benchmarks'):
     print ' '.join(availableBenchmarks())
   elif (args.command == 'run-benchmark'):
-    if (not args.browser or not args.benchmark):
-      error('--browser and --benchmark requried for run-benchmark command')
+    if (not args.browser or not args.benchmark or not args.labels):
+      error('--browser, --labels and --benchmark requried for run-benchmark command')
+
+    if (len(args.browser) != len(args.labels)):
+      error("Must enter the same number of labels as browsers")
+
+    browserLabels = dict(zip(args.browser, args.labels))
 
     results = []
     for browser in args.browser:
