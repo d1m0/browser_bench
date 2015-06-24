@@ -13,8 +13,11 @@ p = argparse.ArgumentParser(description=\
 p.add_argument('--key', type=str, help='Path to JSON key for Google Dev Project')
 p.add_argument('--title', type=str, help='Title of an existing empty spreadsheet in which to work')
 p.add_argument('results_file', type=str, help='File with raw results')
+p.add_argument('--baseline', type=str, help='Label for the browser which should be considered baseline', required=False)
 
 args = p.parse_args()
+
+baseline = args.baseline if 'baseline' in args else None
 
 print "Logging in ..."
 json_key = json.load(open(args.key))                                                                                                                       
@@ -171,7 +174,11 @@ def buildResultsTable2(ws, startRow, startCol, r):
       return cmp(bench1, bench2)
 
   resCols.sort(cmp=sortF)
-  rowNames = range(1, 1 + nruns) + [ 'Mean' ,'Std. Dev.', 'Std. Dev. (%)', 'Mean Overhead (%)', 'Overhead Std. Dev. (%)' ]
+  if (baseline):
+    rowNames = range(1, 1 + nruns) + [ 'Mean' ,'Std. Dev.', 'Std. Dev. (%)', 'Mean Overhead (%)', 'Overhead Std. Dev. (%)' ]
+  else:
+    rowNames = range(1, 1 + nruns) + [ 'Mean' ,'Std. Dev.', 'Std. Dev. (%)' ]
+
   colNames = [cname(c) for c in resCols]
   resTbl = Table(startRow, startCol, rowNames, colNames, ws)
 
@@ -184,16 +191,17 @@ def buildResultsTable2(ws, startRow, startCol, r):
 	resTbl.cellLbl('Mean', colNames[i]))
 		for i in xrange(0, len(colNames))]
 
-  meanOverPerRow = [('=({0}-{1})*100.0/{1}' if col_benchmark(c) != 'octane' else '=({1}-{0})*100.0/{1}').format(\
-    resTbl.cellLbl('Mean', cname(c)), \
-    resTbl.cellLbl('Mean', col_benchmark(c) + ',vanilla')) \
-		for c in resCols]
+  if (baseline):
+    meanOverPerRow = [('=({0}-{1})*100.0/{1}' if col_benchmark(c) != 'octane' else '=({1}-{0})*100.0/{1}').format(\
+      resTbl.cellLbl('Mean', cname(c)), \
+      resTbl.cellLbl('Mean', col_benchmark(c) + ',' + baseline)) \
+      for c in resCols]
 
-  stdevOverPerRow = ['=sqrt({0}*{0}+{1}*{1})*100.0/{2}'.format(\
-    resTbl.cellLbl('Std. Dev.', cname(c)), 
-    resTbl.cellLbl('Std. Dev.', col_benchmark(c) + ',vanilla'), 
-    resTbl.cellLbl('Mean', col_benchmark(c) + ',vanilla')) 
-		for c in resCols]
+    stdevOverPerRow = ['=sqrt({0}*{0}+{1}*{1})*100.0/{2}'.format(\
+      resTbl.cellLbl('Std. Dev.', cname(c)), 
+      resTbl.cellLbl('Std. Dev.', col_benchmark(c) + ',' + baseline), 
+      resTbl.cellLbl('Mean', col_benchmark(c) + ',' + baseline)) 
+      for c in resCols]
 
   contents = transpose([x[2:] for x in resCols]) + \
 	[ meanRow, stdevRow, stdevRowPer, meanOverPerRow, stdevOverPerRow ]
@@ -221,6 +229,7 @@ def buildSummaryTable(ws, startRow, startCol, resTbl, r):
 print "Building Results table"
 resTbl = buildResultsTable2(ws, 7,1, r)
 resTbl.put()
-print "Building Summary table"
-sumTbl = buildSummaryTable(ws, 8 + resTbl.height(), 1, resTbl, r)
-sumTbl.put()
+if (baseline):
+  print "Building Summary of the Overhead table"
+  sumTbl = buildSummaryTable(ws, 8 + resTbl.height(), 1, resTbl, r)
+  sumTbl.put()
