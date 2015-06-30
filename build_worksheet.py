@@ -203,8 +203,12 @@ def buildResultsTable2(ws, startRow, startCol, r):
       resTbl.cellLbl('Mean', col_benchmark(c) + ',' + baseline)) 
       for c in resCols]
 
-  contents = transpose([x[2:] for x in resCols]) + \
-	[ meanRow, stdevRow, stdevRowPer, meanOverPerRow, stdevOverPerRow ]
+  if (baseline):
+    contents = transpose([x[2:] for x in resCols]) + \
+    [ meanRow, stdevRow, stdevRowPer, meanOverPerRow, stdevOverPerRow ]
+  else:
+    contents = transpose([x[2:] for x in resCols]) + \
+    [ meanRow, stdevRow, stdevRowPer ]
   assert isRectangular(contents)
   resTbl.setContents(contents)
 
