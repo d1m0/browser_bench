@@ -9,6 +9,12 @@ git clone https://github.com/burnash/gspread.git gspread
 cd gspread
 python setup.py install
 cd ..
+
+git clone https://github.com/d1m0/gsheets.git
+cd gsheets
+python setup.py install
+cd ..
+
 git clone git://github.com/hyperic/sigar.git sigar
 cd sigar/bindings/python
 python setup.py install
