@@ -52,3 +52,11 @@ docs/_build/
 
 # PyBuilder
 target/
+
+bin
+include
+local
+logs
+third_party
+
+sd\ benchmarks*.json

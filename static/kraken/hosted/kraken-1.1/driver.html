@@ -145,6 +145,9 @@ function finish()
 
 //    location = "results.html?" + encodeURI(outputString);
     publishStatistics(output, 'ms', 'kraken')
+
+	var res_div = document.getElementById('results');
+	res_div.innerHTML = res_div.innerHTML + outputString;
   
 }
 
@@ -153,6 +156,9 @@ function finish()
 <div id="frameparent">
 </div>
 <div id="squares"></div>
+
+<div id="results"></div>
+
 </div>
 </div>
 </body>
