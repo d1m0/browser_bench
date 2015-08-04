@@ -137,7 +137,17 @@ function finish()
     publishStatistics(output, 'ms', 'sunspider-1.0.2')
 
 	var res_div = document.getElementById('results');
-	res_div.innerHTML = res_div.innerHTML + outputString;
+	function append_result(s) {
+		res_div.innerHTML = res_div.innerHTML + s.toString();
+	}
+
+	for (var i = 0; i < output.length; i++) {
+		var current_run = 0.0;
+		for (var test in output[0]) {
+			current_run += output[i][test];
+		}
+		append_result(current_run + "<br/>");
+	}
 }
 
 </script>
