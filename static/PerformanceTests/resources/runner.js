@@ -91,6 +91,10 @@ if (window.testRunner) {
         var statistics = this.computeStatistics(values, unit);
         this.log("");
         this.log(title);
+
+		var res_text = document.getElementById("my-results");
+		res_text.value = statistics.values.join("\n");
+
         if (statistics.values)
             this.log("values " + statistics.values.join(", ") + " " + statistics.unit);
         this.log("avg " + statistics.mean + " " + statistics.unit);
