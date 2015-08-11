@@ -3,6 +3,7 @@ from pickle import load
 import argparse
 from benchmark import availableBenchmarks, error
 import sys
+import pdb
 
 def ave(l):	return sum(l) / (1.0 * len(l))
 def overhead(a,b):	return (a-b)*100.0/b
@@ -29,9 +30,14 @@ def getMean(raw, benchmark):
     return getMeanOctane(raw)
   elif (benchmark == 'kraken'):
     return getMeanKraken(raw)
+  elif (benchmark == 'line-layout'):
+    return getMeanWebKit(raw)
+  elif (benchmark == 'balls'):
+    return getMeanWebKit(raw)
   else:
     print "Unknown benchmark " + benchmark
-    sys.exit(-1)
+    pdb.set_trace()
+    return 0
 
 def getMeans(raw, benchmark):
   return [[getMean(y, benchmark) for y in x] for x in raw]

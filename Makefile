@@ -1,6 +1,6 @@
 NRUNS       = 50
-#BENCHMARKS  = sunspider kraken octane html5
-BENCHMARKS  = html5
+#BENCHMARKS  = sunspider kraken octane html5 line-layout balls
+BENCHMARKS  = line-layout balls
 TYPES       = vanilla ivtbl ivtbl_no_check ovtbl ovtbl_no_check llvmcfi
 #TYPES       = vanilla
 CHROMES_DIR = $(HOME)/chromes
@@ -35,6 +35,14 @@ upload: check-upload-env
 		--title $(title) \
 		--sheet $(sheet) \
 		$(log)
+
+upload-last:
+	. bin/activate; \
+	./build_worksheet.py \
+		--key "sd benchmarks-f2d25d8cd7e4.json" \
+		--title "test" \
+		--sheet "test" \
+		$(shell ls -1t $(LOG_DIR)/*.log | head -1)
 
 check-upload-env: $(patsubst %,check-env-%,title sheet log)
 
