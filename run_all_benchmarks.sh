@@ -1,14 +1,16 @@
 #!/bin/bash
 
 date=$(date +"%m-%d_%H-%M")
-TEST_COUNT=10
+TEST_COUNT=50
+
+# --benchmark sunspider octane kraken html5 \
 
 benchmark_sd_chrome() {
 ./benchmark.py run-benchmark \
-	--browser ~/chromes/vanilla/chrome ~/chromes/interleaved/chrome ~/chromes/checked/chrome \
-	--labels vanilla_2 interleaved_2 checked_1 \
+	--browser ~/chromes/vanilla/chrome ~/chromes/ovtbl/chrome ~/chromes/ivtbl/chrome \
+	--labels vanilla ovtbl ivtbl \
 	--browser_args=--disable-setuid-sandbox \
-	--benchmark sunspider octane kraken html5 \
+	--benchmark line-layout html5 balls \
 	--nruns $TEST_COUNT \
 	--out "sd_all_$date.log"
 }
@@ -23,6 +25,6 @@ benchmark_llvm_cfi_chrome() {
 	--out "llvm_all_$date.log"
 }
 
-#benchmark_sd_chrome
+benchmark_sd_chrome
 
-benchmark_llvm_cfi_chrome
+#benchmark_llvm_cfi_chrome
