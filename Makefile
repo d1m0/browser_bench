@@ -1,8 +1,6 @@
 NRUNS       = 50
-#BENCHMARKS  = sunspider kraken octane html5 line-layout balls
-BENCHMARKS  = line-layout balls
+BENCHMARKS  = sunspider kraken octane html5 line-layout balls
 TYPES       = vanilla ivtbl ivtbl_no_check ovtbl ovtbl_no_check llvmcfi
-#TYPES       = vanilla
 CHROMES_DIR = $(HOME)/chromes
 
 LOG_DIR  = logs
@@ -15,6 +13,7 @@ SHELL    = /bin/bash
 all:
 
 run: log-folder
+	rm -rf $(HOME)/.cache/chromium
 	. bin/activate ; \
 	./benchmark.py run-benchmark \
 		--browser $(BROWSERS) \
